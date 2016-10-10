@@ -1,5 +1,11 @@
 # check_mem
-Nagios plugin for checking available memory and swap on a *nix* machine. 
+Nagios plugin for checking available memory and swap on a *nix* machine. Tested working on several *nix* flavors including:
+
+* Linux-3.10.0-327.4.4.el7.x86_64-x86_64-with-centos-7.2.1511-Core 
+* Linux-3.16.0-30-generic-x86_64-with-Ubuntu-14.04-trusty 
+* Linux-2.6.32-358.2.1.el6.x86_64-x86_64-with-redhat-6.4-Santiago 
+* Linux-2.6.32-504.16.2.el6.x86_64-x86_64-with-centos-6.5-Final 
+* Linux-2.6.32-504.el6.x86_64-x86_64-with-centos-6.6-Final 
 
 ## Prerequisites
 Requires custom nagpyrc library for generating the Nagios return codes and perfdata in the right format
@@ -37,3 +43,6 @@ Output
 OK MEMORY:::: Total: 1840 MB - Used: 148 MB - 8.08% used --- SWAP:::: Used: 1 MB - 0.07% used  ; | 'USED'=155918336B;;;; 'TOTAL'=1929613312B;;;; 'SWAP_USED'=1249280B;;;; 'SWAP_TOTAL'=1719660544B;;;; 'MEM_USED_PCT'=8.08%;;;; 'SWAP_USED_PCT'=0.07%;;;;
 
 ```
+
+## License
+MIT
