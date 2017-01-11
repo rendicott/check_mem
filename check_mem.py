@@ -32,11 +32,12 @@ sversion = 'v0.1'
 scriptfilename = os.path.basename(sys.argv[0])
 defaultlogfilename = scriptfilename + '.log'
 
-def setuplogging(loglevel,printtostdout,logfile):
-    #pretty self explanatory. Takes options and sets up logging.
-    #print "starting up with loglevel",loglevel,logging.getLevelName(loglevel)
+
+def setuplogging(loglevel, printtostdout, logfile):
+    # pretty self explanatory. Takes options and sets up logging.
+    # print "starting up with loglevel",loglevel,logging.getLevelName(loglevel)
     logging.basicConfig(filename=logfile,
-                        filemode='w',level=loglevel,
+                        filemode='w', level=loglevel,
                         format='%(asctime)s:%(levelname)s:%(message)s')
     if printtostdout:
         soh = logging.StreamHandler(sys.stdout)
@@ -44,102 +45,123 @@ def setuplogging(loglevel,printtostdout,logfile):
         logger = logging.getLogger()
         logger.addHandler(soh)
 
+
 def execute_command(commandstring):
     try:
-        output = subprocess.Popen(commandstring,stdout=subprocess.PIPE)
+        output = subprocess.Popen(commandstring, stdout=subprocess.PIPE)
         return(output)
     except Exception as e:
-        msg = "Exception calling command: '%s' , Exception: %s" % (commandstring,str(e))
+        msg = "Exception calling command: '%s' , Exception: %s" % (
+            commandstring, str(e))
         logging.debug(msg)
         return(msg)
 
+
 class Test_crit_warn(unittest.TestCase):
+
     def test_all_good(self):
         # MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
-        m = MemoryState(8000,100,100,1,1,2000,0,2000,None)
+        m = MemoryState(8000, 100, 100, 1, 1, 2000, 0, 2000, None)
         mem_warn_value = 90.00
         mem_crit_value = 95.00
         swap_warn_value = 80.00
         swap_crit_value = 90.00
-        return_value = m.within_critwarn_range(mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
+        return_value = m.within_critwarn_range(
+            mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
         expected_value = 0
         self.assertEqual(return_value, expected_value)
+
     def test_mem_warn(self):
         # MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
-        m = MemoryState(8000,7300,100,1,1,2000,0,2000,None)
+        m = MemoryState(8000, 7300, 100, 1, 1, 2000, 0, 2000, None)
         mem_warn_value = 90.00
         mem_crit_value = 95.00
         swap_warn_value = 80.00
         swap_crit_value = 90.00
-        return_value = m.within_critwarn_range(mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
+        return_value = m.within_critwarn_range(
+            mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
         expected_value = 1
         self.assertEqual(return_value, expected_value)
+
     def test_mem_crit(self):
         # MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
-        m = MemoryState(8000,7900,100,1,1,2000,0,2000,None)
+        m = MemoryState(8000, 7900, 100, 1, 1, 2000, 0, 2000, None)
         mem_warn_value = 90.00
         mem_crit_value = 95.00
         swap_warn_value = 80.00
         swap_crit_value = 90.00
-        return_value = m.within_critwarn_range(mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
+        return_value = m.within_critwarn_range(
+            mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
         expected_value = 2
         self.assertEqual(return_value, expected_value)
+
     def test_swap_warn(self):
         # MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
-        m = MemoryState(8000,2000,6000,1,1,2000,1800,200,None)
+        m = MemoryState(8000, 2000, 6000, 1, 1, 2000, 1800, 200, None)
         mem_warn_value = 90.00
         mem_crit_value = 95.00
         swap_warn_value = 80.00
         swap_crit_value = 90.00
-        return_value = m.within_critwarn_range(mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
+        return_value = m.within_critwarn_range(
+            mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
         expected_value = 1
         self.assertEqual(return_value, expected_value)
+
     def test_swap_crit(self):
         # MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
-        m = MemoryState(8000,2000,6000,1,1,2000,1900,200,None)
+        m = MemoryState(8000, 2000, 6000, 1, 1, 2000, 1900, 200, None)
         mem_warn_value = 90.00
         mem_crit_value = 95.00
         swap_warn_value = 80.00
         swap_crit_value = 90.00
-        return_value = m.within_critwarn_range(mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
+        return_value = m.within_critwarn_range(
+            mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
         expected_value = 2
         self.assertEqual(return_value, expected_value)
+
     def test_swap_trumps_mem(self):
         # MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
-        m = MemoryState(8000,7300,6000,1,1,2000,1900,200,None)
+        m = MemoryState(8000, 7300, 6000, 1, 1, 2000, 1900, 200, None)
         mem_warn_value = 90.00
         mem_crit_value = 95.00
         swap_warn_value = 80.00
         swap_crit_value = 90.00
-        return_value = m.within_critwarn_range(mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
+        return_value = m.within_critwarn_range(
+            mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
         expected_value = 2
         self.assertEqual(return_value, expected_value)
+
     def test_mem_trumps_swap(self):
         # MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
-        m = MemoryState(8000,7900,6000,1,1,2000,100,200,None)
+        m = MemoryState(8000, 7900, 6000, 1, 1, 2000, 100, 200, None)
         mem_warn_value = 90.00
         mem_crit_value = 95.00
         swap_warn_value = 80.00
         swap_crit_value = 90.00
-        return_value = m.within_critwarn_range(mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
+        return_value = m.within_critwarn_range(
+            mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
         expected_value = 2
         self.assertEqual(return_value, expected_value)
+
     def test_bad_warn_value_returns_unknown(self):
         # MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
-        m = MemoryState(8000,7900,6000,1,1,2000,100,200,None)
+        m = MemoryState(8000, 7900, 6000, 1, 1, 2000, 100, 200, None)
         mem_warn_value = '90%'
         mem_crit_value = 95.00
         swap_warn_value = 80.00
         swap_crit_value = 90.00
-        return_value = m.within_critwarn_range(mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
+        return_value = m.within_critwarn_range(
+            mem_warn_value, mem_crit_value, swap_warn_value, swap_crit_value)
         expected_value = 3
         self.assertEqual(return_value, expected_value)
+
 
 class MemoryState():
     '''
     Holds state of memory regardless of the free type
     '''
-    def __init__(self,total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available):
+
+    def __init__(self, total, used, free, shared, buffcache, swap_total, swap_used, swap_free, available):
         self.total = total
         self.used = used
         self.free = free
@@ -155,55 +177,67 @@ class MemoryState():
         (self.mem_used_percentage,
             self.mem_used_percentage_string,
             self.swap_used_percentage,
-            self.swap_used_percentage_string ) = self.determine_used_percentages()
+            self.swap_used_percentage_string) = self.determine_used_percentages()
+
     def dumpself(self):
         msg = 'MemoryStatus\n'
         msg += ' TOTAL: %s\n' % str(self.total)
-        msg += ' USED: %s\n'  % str(self.used)
+        msg += ' USED: %s\n' % str(self.used)
         msg += ' SHARED: %s\n' % str(self.shared)
         msg += ' BUFFCACHE: %s\n' % str(self.buffcache)
         msg += ' AVAILABLE: %s\n' % str(self.available)
         msg += ' SWAP_TOTAL: %s\n' % str(self.swap_total)
         msg += ' SWAP_USED: %s\n' % str(self.swap_used)
         msg += ' SWAP_FREE: %s\n' % str(self.swap_free)
-        msg += ' MEM_USED_PCT_STRING: %s\n' % str(self.mem_used_percentage_string)
-        msg += ' SWAP_USED_PCT_STRING: %s\n' % str(self.swap_used_percentage_string)
+        msg += ' MEM_USED_PCT_STRING: %s\n' % str(
+            self.mem_used_percentage_string)
+        msg += ' SWAP_USED_PCT_STRING: %s\n' % str(
+            self.swap_used_percentage_string)
         return(msg)
+
     def determine_available(self):
         available = self.total - self.used
         if available < 0:
             available = 0
         return available
+
     def determine_used_percentages(self):
         logging.info("Entering determine_used_percentages()")
         mem_used = float(100)
         swap_used = float(100)
         try:
             mem_used = (float(self.used) / float(self.total)) * float(100)
-            mem_used_str = str("%.2f" % round(mem_used,2))
+            mem_used_str = str("%.2f" % round(mem_used, 2))
         except Exception as er:
             logging.critical("Exception: " + str(er))
         if self.swap_total != 0:
             try:
-                swap_used = (float(self.swap_used) / float(self.swap_total)) * float(100)
-                swap_used_str = str("%.2f" % round(swap_used,2))
+                swap_used = (float(self.swap_used) /
+                             float(self.swap_total)) * float(100)
+                swap_used_str = str("%.2f" % round(swap_used, 2))
             except Exception as orf:
                 logging.critical("Exception: " + str(orf))
         else:
             swap_used = float(0)
             swap_used_str = '0.0'
-        return mem_used,mem_used_str,swap_used,swap_used_str
-    def within_critwarn_range(self,mem_warn,mem_crit,swap_warn,swap_crit):
+        return mem_used, mem_used_str, swap_used, swap_used_str
+
+    def within_critwarn_range(self, mem_warn, mem_crit, swap_warn, swap_crit):
         # set returncode unknown until proven otherwise
         returncode_mem = 3
         returncode_swap = 3
         returncode = 3
         try:
-            logging.info("Entering within_crit_warn_range with rc %s" % str(returncode))
-            logging.info("Entering within_crit_warn_range with mem_warn %s" % str(mem_warn))
-            logging.info("Entering within_crit_warn_range with mem_crit %s" % str(mem_crit))
-            logging.info("Entering within_crit_warn_range with swap_warn %s" % str(swap_warn))
-            logging.info("Entering within_crit_warn_range with swap_crit %s" % str(swap_crit))
+            logging.info("Entering within_crit_warn_range with rc %s" %
+                         str(returncode))
+            logging.info(
+                "Entering within_crit_warn_range with mem_warn %s" % str(mem_warn))
+            logging.info(
+                "Entering within_crit_warn_range with mem_crit %s" % str(mem_crit))
+            logging.info(
+                "Entering within_crit_warn_range with swap_warn %s" % str(swap_warn))
+            logging.info(
+                "Entering within_crit_warn_range with swap_crit %s" % str(swap_crit))
             mem_warn = float(mem_warn)
             mem_crit = float(mem_crit)
             swap_warn = float(swap_warn)
@@ -230,12 +264,17 @@ class MemoryState():
             if returncode_swap == 0 and returncode_mem == 0:
                 returncode = 0
 
-            logging.info("Leaving within_crit_warn_range with rc_mem %s" % str(returncode_mem))
-            logging.info("Leaving within_crit_warn_range with rc_swap %s" % str(returncode_swap))
-            logging.info("Leaving within_crit_warn_range with rc %s" % str(returncode))
+            logging.info(
+                "Leaving within_crit_warn_range with rc_mem %s" % str(returncode_mem))
+            logging.info(
+                "Leaving within_crit_warn_range with rc_swap %s" % str(returncode_swap))
+            logging.info("Leaving within_crit_warn_range with rc %s" %
+                         str(returncode))
         except Exception as e:
-            logging.info("Exception warn/crit as floats or warn/crit compare error: %s" % str(e))
+            logging.info(
+                "Exception warn/crit as floats or warn/crit compare error: %s" % str(e))
         return returncode
+
     def convert_bytes_to_mb(self):
         # takes mem total and used and returns values in MB
         total = self.total / 1024 / 1024
@@ -244,8 +283,7 @@ class MemoryState():
         return(total, used, swap_used)
 
 
-
-def process_results(t,r):
+def process_results(t, r):
     '''
     Based on results and type make a MemoryState object
     Sample output type centos7:
@@ -262,7 +300,7 @@ def process_results(t,r):
     available = None
     for line in r:
         if 'Mem:' in line:
-            cleanline = line.replace('\n','')
+            cleanline = line.replace('\n', '')
             chunks = cleanline.split(' ')
             clean_chunks = [x for x in chunks if x != '']
 
@@ -277,20 +315,22 @@ def process_results(t,r):
                 buffcache = int(clean_chunks[5]) + int(clean_chunks[6])
 
         if 'Swap:' in line:
-            cleanline = line.replace('\n','')
+            cleanline = line.replace('\n', '')
             chunks = cleanline.split(' ')
             clean_chunks = [x for x in chunks if x != '']
             swap_total = int(clean_chunks[1])
             swap_used = int(clean_chunks[2])
             swap_free = int(clean_chunks[3])
-    m = MemoryState(total,used,free,shared,buffcache,swap_total,swap_used,swap_free,available)
+    m = MemoryState(total, used, free, shared, buffcache,
+                    swap_total, swap_used, swap_free, available)
     return m
+
 
 def main(options):
     ''' The main() method. Program starts here.
     '''
 
-    results = execute_command(['free','-b'])
+    results = execute_command(['free', '-b'])
 
     # default the type of the free command to 'standard'
     # we'll set to centos7 if we detect as such
@@ -306,7 +346,7 @@ def main(options):
 
     logging.info("Output from 'free' command is of type: '%s'" % free_version)
 
-    memstats = process_results(free_version,rlist)
+    memstats = process_results(free_version, rlist)
 
     logging.info(memstats.dumpself())
 
@@ -317,42 +357,49 @@ def main(options):
         sw = float(options.swap_warn_percentage)
         sc = float(options.swap_crit_percentage)
     except Exception as ar:
-        logging.info("Exception casting warn/crits as floats in main: %s" % str(ar))
+        logging.info(
+            "Exception casting warn/crits as floats in main: %s" % str(ar))
 
     if options.perfdata_only.lower() == 'no':
         # pass in to check within ranges
-        nagios_rc = memstats.within_critwarn_range(mw,mc,sw,sc)
+        nagios_rc = memstats.within_critwarn_range(mw, mc, sw, sc)
     else:
         nagios_rc = 0
 
     # sample current return string
-    #     Memory: OK Total: 1840 MB - Used: -1310 MB - -71% used|TOTAL=1929613312;;;; USED=-1374179328;;;; CACHE=1510100992;;;; BUFFER=755486720;;;;
+    # Memory: OK Total: 1840 MB - Used: -1310 MB - -71%
+    # used|TOTAL=1929613312;;;; USED=-1374179328;;;; CACHE=1510100992;;;;
+    # BUFFER=755486720;;;;
     perfdata = []
-    pc_used = PerfChunk(stringname='USED',value=memstats.used,unit='B')
+    pc_used = PerfChunk(stringname='USED', value=memstats.used, unit='B')
     perfdata.append(pc_used)
 
-    pc_total = PerfChunk(stringname='TOTAL',value=memstats.total,unit='B')
+    pc_total = PerfChunk(stringname='TOTAL', value=memstats.total, unit='B')
     perfdata.append(pc_total)
 
-    pc_swap_used = PerfChunk(stringname='SWAP_USED',value=memstats.swap_used,unit='B')
+    pc_swap_used = PerfChunk(stringname='SWAP_USED',
+                             value=memstats.swap_used, unit='B')
     perfdata.append(pc_swap_used)
 
-    pc_swap_total = PerfChunk(stringname='SWAP_TOTAL',value=memstats.swap_total,unit='B')
+    pc_swap_total = PerfChunk(stringname='SWAP_TOTAL',
+                              value=memstats.swap_total, unit='B')
     perfdata.append(pc_swap_total)
 
-    pc_mem_used_pct = PerfChunk(stringname='MEM_USED_PCT',value=memstats.mem_used_percentage_string,unit='%')
+    pc_mem_used_pct = PerfChunk(
+        stringname='MEM_USED_PCT', value=memstats.mem_used_percentage_string, unit='%')
     perfdata.append(pc_mem_used_pct)
 
-    pc_swap_used_pct = PerfChunk(stringname='SWAP_USED_PCT',value=memstats.swap_used_percentage_string,unit='%')
+    pc_swap_used_pct = PerfChunk(
+        stringname='SWAP_USED_PCT', value=memstats.swap_used_percentage_string, unit='%')
     perfdata.append(pc_swap_used_pct)
 
-    ( mem_total_mb, mem_used_mb, swap_used_mb ) = memstats.convert_bytes_to_mb()
+    (mem_total_mb, mem_used_mb, swap_used_mb) = memstats.convert_bytes_to_mb()
     msgstring = ("MEMORY:::: Total: %s MB - Used: %s MB - %s%% used --- "
                  "SWAP:::: Used: %s MB - %s%% used" % (mem_total_mb,
-                                                     mem_used_mb,
-                                                     memstats.mem_used_percentage_string,
-                                                     swap_used_mb,
-                                                     memstats.swap_used_percentage_string)
+                                                       mem_used_mb,
+                                                       memstats.mem_used_percentage_string,
+                                                       swap_used_mb,
+                                                       memstats.swap_used_percentage_string)
                  )
     logging.info("Current RC = %s" % str(nagios_rc))
     nm = NagiosReturnCode(returncode=nagios_rc, msgstring=msgstring)
@@ -381,69 +428,73 @@ def main(options):
     '''
 
 if __name__ == '__main__':
-    #unittest.main()
+    # unittest.main()
     '''This main section is mostly for parsing arguments to the
     script and setting up debugging'''
     from optparse import OptionParser
     '''set up an additional option group just for debugging parameters'''
     from optparse import OptionGroup
-    usage = ("%prog [--debug] [--printtostdout] [--logfile] [--version] [--help] [--samplefileoption]")
-    #set up the parser object
+    usage = (
+        "%prog [--debug] [--printtostdout] [--logfile] [--version] [--help] [--samplefileoption]")
+    # set up the parser object
     parser = OptionParser(usage, version='%prog ' + sversion)
-    parser.add_option('-w','--mem_warn_percentage',
+    parser.add_option('-w', '--mem_warn_percentage',
                       type='string',
-                      help=("Warning threshold percentage for used memory. Default='90'"),
+                      help=(
+                          "Warning threshold percentage for used memory. Default='90'"),
                       default='90')
-    parser.add_option('-c','--mem_crit_percentage',
+    parser.add_option('-c', '--mem_crit_percentage',
                       type='string',
-                      help=("Critical threshold percentage for used memory. Default='95'"),
+                      help=(
+                          "Critical threshold percentage for used memory. Default='95'"),
                       default='95')
     parser.add_option('--swap_warn_percentage',
                       type='string',
-                      help=("Warning threshold percentage for used swap. Default='75'"),
+                      help=(
+                          "Warning threshold percentage for used swap. Default='75'"),
                       default='75')
     parser.add_option('--swap_crit_percentage',
                       type='string',
-                      help=("Critical threshold percentage for used swap. Default='90'"),
+                      help=(
+                          "Critical threshold percentage for used swap. Default='90'"),
                       default='90')
     parser.add_option('--perfdata_only',
                       type='string',
                       help=("Options are 'no' or 'yes'. When yes then check will always "
                             "return OK. Default='no'"),
                       default='no')
-    parser_debug = OptionGroup(parser,'Debug Options')
-    parser_debug.add_option('-d','--debug',type='string',
-        help=('Available levels are CRITICAL (3), ERROR (2), '
-            'WARNING (1), INFO (0), DEBUG (-1)'),
-        default='CRITICAL')
-    parser_debug.add_option('-p','--printtostdout',action='store_true',
-        default=False,help='Print all log messages to stdout')
-    parser_debug.add_option('-l','--logfile',type='string',metavar='FILE',
-        help=('Desired filename of log file output. Default '
-            'is "'+ defaultlogfilename +'"')
-        ,default=defaultlogfilename)
-    #officially adds the debuggin option group
+    parser_debug = OptionGroup(parser, 'Debug Options')
+    parser_debug.add_option('-d', '--debug', type='string',
+                            help=('Available levels are CRITICAL (3), ERROR (2), '
+                                  'WARNING (1), INFO (0), DEBUG (-1)'),
+                            default='CRITICAL')
+    parser_debug.add_option('-p', '--printtostdout', action='store_true',
+                            default=False, help='Print all log messages to stdout')
+    parser_debug.add_option('-l', '--logfile', type='string', metavar='FILE',
+                            help=('Desired filename of log file output. Default '
+                                  'is "' + defaultlogfilename + '"'), default=defaultlogfilename)
+    # officially adds the debuggin option group
     parser.add_option_group(parser_debug)
-    options,args = parser.parse_args() #here's where the options get parsed
+    options, args = parser.parse_args()  # here's where the options get parsed
 
-    try: #now try and get the debugging options
-        loglevel = getattr(logging,options.debug)
-    except AttributeError: #set the log level
-        loglevel = {3:logging.CRITICAL,
-                    2:logging.ERROR,
-                    1:logging.WARNING,
-                    0:logging.INFO,
-                    -1:logging.DEBUG,
+    try:  # now try and get the debugging options
+        loglevel = getattr(logging, options.debug)
+    except AttributeError:  # set the log level
+        loglevel = {3: logging.CRITICAL,
+                    2: logging.ERROR,
+                    1: logging.WARNING,
+                    0: logging.INFO,
+                    -1: logging.DEBUG,
                     }[int(options.debug)]
 
     try:
-        open(options.logfile,'w') #try and open the default log file
+        open(options.logfile, 'w')  # try and open the default log file
     except:
-        #print "Unable to open log file '%s' for writing." % options.logfile
+        # print "Unable to open log file '%s' for writing." % options.logfile
         logging.debug(
             "Unable to open log file '%s' for writing." % options.logfile)
 
-    setuplogging(loglevel,options.printtostdout,options.logfile)
+    setuplogging(loglevel, options.printtostdout, options.logfile)
     # now launch the main method. Have to do a try catch for Nagios
     #  to properly see the application's exit return code.
 
