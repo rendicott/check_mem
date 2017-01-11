@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 '''
 Checks total available and free memory
 as a replacement for check_mem.sh
