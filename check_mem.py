@@ -315,6 +315,7 @@ def process_results(free_version, r):
                 available = int(clean_chunks[6])
             else:
                 buffcache = int(clean_chunks[5]) + int(clean_chunks[6])
+                used = used - buffcache
 
         if 'Swap:' in line:
             cleanline = line.replace('\n', '')
