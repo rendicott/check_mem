@@ -24,6 +24,8 @@ from optparse import OptionParser, OptionGroup
 from datetime import datetime
 from datetime import timedelta
 
+from distutils.version import LooseVersion
+
 from nagpyrc import NagiosReturn
 from nagpyrc import PerfChunk
 from nagpyrc import NagiosReturnCode
@@ -283,7 +285,7 @@ class MemoryState():
         return(total, used, swap_used)
 
 
-def process_results(t, r):
+def process_results(free_version, r):
     '''
     Based on results and type make a MemoryState object
     Sample output type centos7:
@@ -308,7 +310,7 @@ def process_results(t, r):
             used = int(clean_chunks[2])
             free = int(clean_chunks[3])
             shared = int(clean_chunks[4])
-            if t == 'centos7':
+            if LooseVersion(free_version) > LooseVersion('3.3.9'):
                 buffcache = int(clean_chunks[5])
                 available = int(clean_chunks[6])
             else:
@@ -330,6 +332,10 @@ def main(options):
     ''' The main() method. Program starts here.
     '''
 
+    version = execute_command(['free', '-V'])
+    version_line = version.stdout.readline()
+    free_version = version_line.split()[3]
+
     results = execute_command(['free', '-b'])
 
     # default the type of the free command to 'standard'
@@ -337,14 +343,11 @@ def main(options):
     # technically versions are as follows:
     #    All other OS's: 'free from procps-ng 3.3.9'
     #    CentOS:         'free from procps-ng 3.3.10'
-    free_version = 'standard'
     rlist = []
     for line in results.stdout.readlines():
         rlist.append(line)
-        if 'buff/cache' in line:
-            free_version = 'centos7'
 
-    logging.info("Output from 'free' command is of type: '%s'" % free_version)
+    logging.info("Output from 'free' command is of version: '%s'" % free_version)
 
     memstats = process_results(free_version, rlist)
 
