@@ -335,7 +335,7 @@ def main(options):
 
     version = execute_command(['free', '-V'])
     version_line = version.stdout.readline()
-    free_version = version_line.split()[3]
+    free_version = version_line.split()[-1]
 
     results = execute_command(['free', '-b'])
 
