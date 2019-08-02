@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 '''
 Checks total available and free memory
 as a replacement for check_mem.sh
@@ -301,8 +301,10 @@ def process_results(free_version, r):
     '''
     available = None
     for line in r:
-        if 'Mem:' in line:
-            cleanline = line.replace('\n', '')
+        #if 'Mem:' in line:
+        if b'Mem:' in line:
+            #cleanline = line.replace('\n', '')
+            cleanline = line.decode('unicode-escape').replace('\n', '')
             chunks = cleanline.split(' ')
             clean_chunks = [x for x in chunks if x != '']
 
@@ -317,8 +319,10 @@ def process_results(free_version, r):
                 buffcache = int(clean_chunks[5]) + int(clean_chunks[6])
                 used = used - buffcache
 
-        if 'Swap:' in line:
-            cleanline = line.replace('\n', '')
+        #if 'Swap:' in line:
+        if b'Swap:' in line:
+            #cleanline = line.replace('\n', '')
+            cleanline = line.decode('unicode-escape').replace('\n', '')
             chunks = cleanline.split(' ')
             clean_chunks = [x for x in chunks if x != '']
             swap_total = int(clean_chunks[1])
@@ -350,7 +354,8 @@ def main(options):
 
     logging.info("Output from 'free' command is of version: '%s'" % free_version)
 
-    memstats = process_results(free_version, rlist)
+    #memstats = process_results(free_version, rlist)
+    memstats = process_results(free_version.decode('unicode-escape'), rlist)
 
     logging.info(memstats.dumpself())
 
@@ -504,6 +509,8 @@ if __name__ == '__main__':
 
     try:
         main(options)
-    except NagiosReturn, e:
-        print e.message
+    #except NagiosReturn, e:
+    except NagiosReturn as e:
+        #print e.message
+        print(e.message)
         sys.exit(e.code)
